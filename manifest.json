@@ -1,0 +1,21 @@
+{
+  "name": "nordic",
+  "version": "1.0.0",
+  "author": "Shadow-TermDev",
+  "description": "Nord-inspired theme — arctic blues, Polar Night, Snow Storm, JetBrains Mono",
+  "repo": "https://github.com/Shadow-TermDev/nordic-rice-termux",
+  "dependencies": {
+    "packages": ["neofetch"],
+    "pip": [],
+    "omz_plugins": []
+  },
+  "install": {
+    "colors": true,
+    "font": false,
+    "termux_properties": true
+  },
+  "files": {
+    "neofetch.conf": "~/.config/neofetch/config.conf",
+    "nordic-fetch": "~/.local/bin/nordic-fetch"
+  }
+}

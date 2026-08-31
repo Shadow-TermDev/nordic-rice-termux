@@ -1,0 +1,11 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# nordic-fetch — Custom neofetch wrapper with Nord colors
+# This demonstrates how RICE creators can include custom scripts
+
+if command -v neofetch &>/dev/null; then
+    neofetch --config "$HOME/.config/neofetch/config.conf"
+else
+    echo "Installing neofetch..."
+    pkg install -y neofetch
+    neofetch
+fi
