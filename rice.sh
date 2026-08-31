@@ -92,3 +92,14 @@ if [[ "${SHADOW_TTS_ENABLED}" == "true" ]] && command -v termux-tts-speak &>/dev
     disown 2>/dev/null || true
     unset _h _g
 fi
+
+# ── Cargar alias/funciones del RICE de forma agnóstica (fix para eza/la/ll) ──
+# Solución del usuario: rice.sh hace source de sus propios aliases.sh/functions.sh
+# vía BASH_SOURCE, así active_rice.sh (copia de rice.sh) siempre registra los alias
+RICE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}" )" 2>/dev/null && pwd || cd "$(dirname "$0")" && pwd)"
+[ -f "$RICE_SCRIPT_DIR/aliases.sh" ] && source "$RICE_SCRIPT_DIR/aliases.sh"
+[ -f "$RICE_SCRIPT_DIR/functions.sh" ] && source "$RICE_SCRIPT_DIR/functions.sh"
+# Fallback modular: si el RICE no trae aliases, usa los globales
+if ! alias ls &>/dev/null; then
+    [ -f "$HOME/.shadow-setup/aliases.sh" ] && source "$HOME/.shadow-setup/aliases.sh"
+fi
