@@ -1,10 +1,28 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# nordic-fetch — Custom neofetch wrapper with Nord colors
+# nordic-fetch — neofetch/fastfetch wrapper with Nord config
+# Usage: nordic-fetch [args passed to neofetch/fastfetch]
 
+set -euo pipefail
+
+CONFIG="$HOME/.config/neofetch/config.conf"
+
+# Allow args passthrough
 if command -v neofetch &>/dev/null; then
-    neofetch --config "$HOME/.config/neofetch/config.conf"
+    if [[ -f "$CONFIG" ]]; then
+        exec neofetch --config "$CONFIG" "$@"
+    else
+        exec neofetch "$@"
+    fi
+elif command -v fastfetch &>/dev/null; then
+    # fastfetch fallback — neofetch config not compatible, just run it
+    exec fastfetch "$@"
 else
-    echo "Installing neofetch..."
-    pkg install -y neofetch
-    neofetch --config "$HOME/.config/neofetch/config.conf"
+    echo "nordic-fetch: neither neofetch nor fastfetch found." >&2
+    echo "Install one with: pkg install neofetch" >&2
+    # Try auto-install non-interactively
+    if command -v pkg &>/dev/null; then
+        echo "Attempting to install neofetch..." >&2
+        pkg install -y neofetch && exec neofetch --config "$CONFIG" "$@" 2>/dev/null || true
+    fi
+    exit 1
 fi
