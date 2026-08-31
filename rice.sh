@@ -2,7 +2,6 @@
 # ================================================
 #  Nordic RICE — Polar Night theme
 #  Inspired by Nord color palette
-#  arcticblues, Polar Night, Snow Storm
 # ================================================
 
 # Colors (Nord palette)
@@ -22,11 +21,9 @@ SHADOW_TTS_MSG="Nordic terminal ready"
 
 # Environment
 export SHADOW_RICE="nordic"
-export BAT_THEME="Nord"
 export PROMPT_EOL_MARK="|"
-export NEOFetch_CONFIG="$HOME/.config/neofetch/config.conf"
 
-# Nord color variables for scripts
+# Nord color variables
 export NORD0="2e3440"
 export NORD1="3b4252"
 export NORD2="434c5e"
@@ -44,17 +41,67 @@ export NORD13="ebcb8b"
 export NORD14="a3be8c"
 export NORD15="b48ead"
 
+# Disable p10k prompt (we use custom prompt below)
+# p10k uses precmd hooks, so we need to remove them
+if (( $+functions[precmd] )); then
+    unfunction precmd 2>/dev/null
+fi
+if (( $+functions[precmd_functions] )); then
+    precmd_functions=()
+fi
+
+# Custom Nordic prompt
+nordic_prompt() {
+    local NordBlue="%F{#88c0d0}"
+    local NordFrost="%F{#81a1c1}"
+    local NordGreen="%F{#a3be8c}"
+    local NordRed="%F{#bf616a}"
+    local NordYellow="%F{#ebcb8b}"
+    local NordMagenta="%F{#b48ead}"
+    local NordGray="%F{#4c566a}"
+    local Reset="%f"
+
+    local DirIcon="%F{#5e81ac}%_bold󰉋%f%b"
+    local GitIcon="%F{#a3be8c}󰊢%f"
+    local TimeIcon="%F{#ebcb8b}%{$reset_color%}"
+    local UserIcon="%F{#b48ead}󰇽%f"
+
+    local Dir="%~"
+    local Time="%D{%H:%M}"
+    local User="%n@%m"
+
+    local GitBranch=""
+    if command -v git &>/dev/null; then
+        local branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+        if [[ -n "$branch" ]]; then
+            GitBranch=" $GitIcon %F{#a3be8c}$branch%f"
+        fi
+    fi
+
+    local ExitStatus="%(?.$NordGreen ✔.$NordRed ✘)"
+
+    PROMPT="$NordGray╭─ $UserIcon $NordMagenta$User$Reset $NordGray─$Reset $DirIcon $NordBlue$Dir$Reset$GitBranch
+$NordGray╰─$Reset $ExitStatus $NordFrost❯%f "
+}
+
+nordic_prompt
+
+# Neofetch on startup
+if command -v neofetch &>/dev/null; then
+    neofetch --config "$HOME/.config/neofetch/config.conf" 2>/dev/null
+fi
+
 # Startup animation
 if [[ "$SHADOW_STARTUP_ANIM" == "true" ]]; then
     mensaje="$SHADOW_STARTUP_MSG"
-    color='\033[38;2;136;192;208m'  # Nord8 in RGB
+    color='\033[38;2;136;192;208m'
     fin_color='\033[0m'
     for ((i=0; i<${#mensaje}; i++)); do
         echo -ne "${color}${mensaje:$i:1}${fin_color}"
         sleep 0.08
     done
     echo
-    sleep 0.2
+    sleep 0.15
 fi
 
 # TTS greeting
