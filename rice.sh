@@ -17,7 +17,7 @@ SHADOW_STARTUP_ANIM=true
 # TTS — greeting is time-aware, message is suffix
 SHADOW_TTS_ENABLED=true
 SHADOW_TTS_LANG="en-US"
-SHADOW_TTS_RATE="1.0"
+SHADOW_TTS_RATE="1.1"
 SHADOW_TTS_MSG="Nordic terminal ready"
 
 # Environment
@@ -43,32 +43,51 @@ export NORD13="ebcb8b"
 export NORD14="a3be8c"
 export NORD15="b48ead"
 
+# ── Configuraciones para Autocompletado Extendido en ZSH ─────
+if [[ -n "${ZSH_VERSION:-}" ]]; then
+    # Permite sugerencias avanzadas en comandos encadenados/pipes (|)
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+    
+    # Color de las sugerencias (Gris Nord 3 / Nord 4 tenue)
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#4c566a"
+
+    # Opciones del motor de completado de Zsh
+    setopt ALWAYS_TO_END        # Mueve el cursor al final de la palabra al completar
+    setopt AUTO_MENU            # Muestra menú de autocompletar tras repetir Tab
+    setopt COMPLETE_IN_WORD     # Completa desde el centro de una palabra
+fi
+
 # ── Neofetch on startup ──────────────────────────────────────
 # Prefer fastfetch if available, fallback to neofetch.
-# Run via bash to avoid zsh prompt leaking into neofetch output.
 if command -v neofetch &>/dev/null; then
-    bash -c 'neofetch --config "$HOME/.config/neofetch/config.conf"' 2>/dev/null || true
+    neofetch --config "$HOME/.config/neofetch/config.conf" 2>/dev/null || true
 elif command -v fastfetch &>/dev/null; then
     fastfetch 2>/dev/null || true
 fi
 
-# ── Startup animation ────────────────────────────────────────
+# ── Startup animation (Compatible Zsh & Bash) ────────────────
 if [[ "${SHADOW_STARTUP_ANIM}" == "true" ]]; then
     _nordic_msg="${SHADOW_STARTUP_MSG}"
     _nordic_color=$'\033[38;2;136;192;208m'
     _nordic_reset=$'\033[0m'
-    # Respect NO_ANIM / non-interactive shells
+    
     if [[ -t 1 && -z "${NO_ANIM:-}" ]]; then
-        for (( _i=0; _i<${#_nordic_msg}; _i++ )); do
-            printf '%s%s%s' "${_nordic_color}" "${_nordic_msg:$_i:1}" "${_nordic_reset}"
-            sleep 0.04
+        # Bucle compatible universalmente para animación carácter por carácter
+        local _len=${#_nordic_msg}
+        for (( _i=1; _i<=_len; _i++ )); do
+            if [[ -n "${ZSH_VERSION:-}" ]]; then
+                printf '%s%s%s' "${_nordic_color}" "${_nordic_msg[_i]}" "${_nordic_reset}"
+            else
+                printf '%s%s%s' "${_nordic_color}" "${_nordic_msg:$((_i-1)):1}" "${_nordic_reset}"
+            fi
+            sleep 0.03 2>/dev/null || sleep 1
         done
         printf '\n'
-        sleep 0.1
     else
         printf '%s%s%s\n' "${_nordic_color}" "${_nordic_msg}" "${_nordic_reset}"
     fi
-    unset _nordic_msg _nordic_color _nordic_reset _i
+    unset _nordic_msg _nordic_color _nordic_reset _i _len
 fi
 
 # ── TTS greeting (time-aware, detached) ──────────────────────
@@ -79,14 +98,6 @@ if [[ "${SHADOW_TTS_ENABLED}" == "true" ]] && command -v termux-tts-speak &>/dev
         if (( _h >= 6 && _h < 12 )); then _g="Good morning"
         elif (( _h >= 12 && _h < 19 )); then _g="Good afternoon"
         fi
-        # Use configured message as suffix
         termux-tts-speak -l "${SHADOW_TTS_LANG}" -r "${SHADOW_TTS_RATE}" "${_g}, ${SHADOW_TTS_MSG}" 2>/dev/null
-    ) &>/dev/null &
-    # Disown only in zsh; bash uses disown silently
-    if [[ -n "${ZSH_VERSION:-}" ]]; then
-        disown 2>/dev/null || true
-    else
-        disown 2>/dev/null || true
-    fi
-    unset _h _g
+    ) &>/dev/null &!
 fi

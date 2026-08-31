@@ -7,9 +7,12 @@
   "license": "MIT",
   "keywords": ["nord", "arctic", "minimal", "p10k", "termux"],
   "dependencies": {
-    "packages": ["neofetch"],
+    "packages": ["neofetch", "git", "eza", "fzf", "bat"],
     "pip": [],
-    "omz_plugins": []
+    "omz_plugins": [
+      "zsh-autosuggestions",
+      "zsh-syntax-highlighting"
+    ]
   },
   "install": {
     "colors": true,

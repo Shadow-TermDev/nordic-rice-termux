@@ -19,6 +19,7 @@ elif command -v fastfetch &>/dev/null; then
 else
     echo "nordic-fetch: neither neofetch nor fastfetch found." >&2
     echo "Install one with: pkg install neofetch" >&2
+    
     # Try auto-install non-interactively
     if command -v pkg &>/dev/null; then
         echo "Attempting to install neofetch..." >&2
