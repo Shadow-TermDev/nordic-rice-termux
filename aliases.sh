@@ -18,16 +18,19 @@ if command -v zoxide &>/dev/null; then
 fi
 
 # -----------------------------------------------
-# ls -> eza (fallback to ls)
+# ls -> eza (fallback to ls) — Nerd Fonts aware
+#  --icons=auto: autodetecta Nerd Font, evita □ si no está instalada
+#  --color=auto: respeta pipes y NO_COLOR para modularidad
 # -----------------------------------------------
 if command -v eza &>/dev/null; then
-    alias ls='eza --icons --group-directories-first --time-style=long-iso'
-    alias ll='eza -lah --icons --group-directories-first --git'
-    alias la='eza -a --icons --group-directories-first'
-    alias l='eza -lh --icons --group-directories-first'
-    alias lt='eza -T --icons --group-directories-first --level=2'
-    alias lta='eza -Ta --icons --group-directories-first'
+    alias ls='eza --icons=auto --group-directories-first --color=auto --time-style=long-iso'
+    alias ll='eza -lah --icons=auto --group-directories-first --git --color=auto'
+    alias la='eza -a --icons=auto --group-directories-first --color=auto'
+    alias l='eza -lh --icons=auto --group-directories-first --color=auto'
+    alias lt='eza -T --icons=auto --group-directories-first --level=2 --color=auto'
+    alias lta='eza -Ta --icons=auto --group-directories-first --color=auto'
 else
+    alias ls='ls --color=auto'
     alias ll='ls -lah --color=auto'
     alias la='ls -A --color=auto'
     alias l='ls -lh --color=auto'
