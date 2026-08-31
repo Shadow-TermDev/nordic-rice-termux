@@ -16,7 +16,7 @@
   },
   "install": {
     "colors": true,
-    "font": false,
+    "font": true,
     "termux_properties": true
   },
   "files": {
