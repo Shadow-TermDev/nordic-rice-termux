@@ -15,10 +15,10 @@ SHADOW_STARTUP_MSG="The north awaits"
 SHADOW_STARTUP_ANIM=true
 
 # TTS — greeting is time-aware, message is suffix
-SHADOW_TTS_ENABLED=true
-SHADOW_TTS_LANG="en-US"
-SHADOW_TTS_RATE="1.4"
-SHADOW_TTS_MSG="Nordic terminal ready"
+SHADOW_TTS_ENABLED=false
+# SHADOW_TTS_LANG="en-US"
+# SHADOW_TTS_RATE="1.0"
+# SHADOW_TTS_MSG="Nordic terminal ready"
 
 # Environment
 export SHADOW_RICE="nordic"
