@@ -17,7 +17,7 @@ SHADOW_STARTUP_ANIM=true
 # TTS — greeting is time-aware, message is suffix
 SHADOW_TTS_ENABLED=true
 SHADOW_TTS_LANG="en-US"
-SHADOW_TTS_RATE="1.3"
+SHADOW_TTS_RATE="1.4"
 SHADOW_TTS_MSG="Nordic terminal ready"
 
 # Environment

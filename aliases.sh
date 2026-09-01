@@ -17,21 +17,26 @@ if command -v zoxide &>/dev/null; then
     alias cdi="zi"
 fi
 
-# -----------------------------------------------
-# ls -> eza (fallback to ls) — Nerd Fonts aware
-#  --icons=auto: autodetecta Nerd Font, evita □ si no está instalada
-#  Modular: explícitamente eza para que ls/la/ll/tree funcionen sin depender del base
-#  Funciones aseguran que `eza` sin args liste "." (fix para eza 0.23.5 sin path)
-# -----------------------------------------------
+# ================================================
+# Aliases globales / RICE
+# ================================================
+
+# Eliminar alias o funciones previas de ls para evitar conflictos
+unalias ls 2>/dev/null || true
+unalias ll 2>/dev/null || true
+unalias la 2>/dev/null || true
+
 if command -v eza &>/dev/null; then
-    ls() { if [ $# -eq 0 ]; then eza --icons=auto --group-directories-first .; else eza --icons=auto --group-directories-first "$@"; fi; }
-    la() { if [ $# -eq 0 ]; then eza -a --icons=auto --group-directories-first .; else eza -a --icons=auto --group-directories-first "$@"; fi; }
-    ll() { if [ $# -eq 0 ]; then eza -la --icons=auto --octal-permissions --group-directories-first .; else eza -la --icons=auto --octal-permissions --group-directories-first "$@"; fi; }
-    tree() { eza --tree --icons=auto "${@:-.}"; }
+    alias ls='eza --icons=auto --group-directories-first'
+    alias ll='eza -la --icons=auto --octal-permissions --group-directories-first'
+    alias la='eza -a --icons=auto --group-directories-first'
+    alias l='eza -lh --icons=auto --group-directories-first'
+    alias tree='eza --tree --icons=auto'
 else
     alias ls='ls --color=auto'
-    alias la='ls -A --color=auto'
-    alias ll='ls -lah --color=auto'
+    alias ll='ls -lah'
+    alias la='ls -a'
+    alias l='ls -lh'
 fi
 
 # -----------------------------------------------
