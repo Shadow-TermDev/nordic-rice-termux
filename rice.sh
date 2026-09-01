@@ -17,7 +17,7 @@ SHADOW_STARTUP_ANIM=true
 # TTS — greeting is time-aware, message is suffix
 SHADOW_TTS_ENABLED=true
 SHADOW_TTS_LANG="en-US"
-SHADOW_TTS_RATE="1.1"
+SHADOW_TTS_RATE="1.3"
 SHADOW_TTS_MSG="Nordic terminal ready"
 
 # Environment
@@ -79,27 +79,22 @@ if [[ "${SHADOW_STARTUP_ANIM}" == "true" ]]; then
     unset _nordic_msg _nordic_color _nordic_reset _nordic_len _nordic_i _nordic_char
 fi
 
-# ── TTS greeting (time-aware, detached, compatible bash/zsh) ───────
-if [[ "${SHADOW_TTS_ENABLED}" == "true" ]] && command -v termux-tts-speak &>/dev/null; then
-    (
-        _h=$(date +%H)
-        _g="Good evening"
-        if (( _h >= 6 && _h < 12 )); then _g="Good morning"
-        elif (( _h >= 12 && _h < 19 )); then _g="Good afternoon"
-        fi
-        termux-tts-speak -l "${SHADOW_TTS_LANG}" -r "${SHADOW_TTS_RATE}" "${_g}, ${SHADOW_TTS_MSG}" 2>/dev/null
-    ) >/dev/null 2>&1 &
-    disown 2>/dev/null || true
-    unset _h _g
-fi
-
 # ── Cargar alias/funciones del RICE de forma agnóstica (fix para eza/la/ll) ──
-# Solución del usuario: rice.sh hace source de sus propios aliases.sh/functions.sh
-# vía BASH_SOURCE, así active_rice.sh (copia de rice.sh) siempre registra los alias
-RICE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}" )" 2>/dev/null && pwd || cd "$(dirname "$0")" && pwd)"
+# 100% compatible Bash/Zsh: Zsh no define BASH_SOURCE al hacer source
+if [[ -n "${ZSH_VERSION:-}" ]]; then
+    RICE_SCRIPT_DIR="$(cd "$(dirname "${(%):-%x}")" 2>/dev/null && pwd)"
+else
+    RICE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+fi
+# Fallback a $0 si lo anterior falla
+if [[ -z "${RICE_SCRIPT_DIR:-}" ]] || [[ ! -d "${RICE_SCRIPT_DIR:-}" ]]; then
+    RICE_SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+fi
 [ -f "$RICE_SCRIPT_DIR/aliases.sh" ] && source "$RICE_SCRIPT_DIR/aliases.sh"
 [ -f "$RICE_SCRIPT_DIR/functions.sh" ] && source "$RICE_SCRIPT_DIR/functions.sh"
-# Fallback modular: si el RICE no trae aliases, usa los globales
 if ! alias ls &>/dev/null; then
     [ -f "$HOME/.shadow-setup/aliases.sh" ] && source "$HOME/.shadow-setup/aliases.sh"
+fi
+if ! declare -f mkcd &>/dev/null && ! typeset -f mkcd &>/dev/null; then
+    [ -f "$HOME/.shadow-setup/functions.sh" ] && source "$HOME/.shadow-setup/functions.sh"
 fi

@@ -21,12 +21,17 @@ fi
 # ls -> eza (fallback to ls) — Nerd Fonts aware
 #  --icons=auto: autodetecta Nerd Font, evita □ si no está instalada
 #  Modular: explícitamente eza para que ls/la/ll/tree funcionen sin depender del base
+#  Funciones aseguran que `eza` sin args liste "." (fix para eza 0.23.5 sin path)
 # -----------------------------------------------
 if command -v eza &>/dev/null; then
-    alias ls='eza --icons=auto --group-directories-first'
-    alias la='eza -a --icons=auto --group-directories-first'
-    alias ll='eza -la --icons=auto --octal-permissions --group-directories-first'
-    alias tree='eza --tree --icons=auto'
+    ls() { if [ $# -eq 0 ]; then eza --icons=auto --group-directories-first .; else eza --icons=auto --group-directories-first "$@"; fi; }
+    la() { if [ $# -eq 0 ]; then eza -a --icons=auto --group-directories-first .; else eza -a --icons=auto --group-directories-first "$@"; fi; }
+    ll() { if [ $# -eq 0 ]; then eza -la --icons=auto --octal-permissions --group-directories-first .; else eza -la --icons=auto --octal-permissions --group-directories-first "$@"; fi; }
+    tree() { eza --tree --icons=auto "${@:-.}"; }
+else
+    alias ls='ls --color=auto'
+    alias la='ls -A --color=auto'
+    alias ll='ls -lah --color=auto'
 fi
 
 # -----------------------------------------------
